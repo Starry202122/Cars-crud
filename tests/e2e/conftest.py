@@ -73,3 +73,10 @@ def page(browser):
         yield page
     finally:
         context.close()
+def pytest_addoption(parser):
+    parser.addoption(
+        "--headed",
+        action="store_true",
+        default=False,
+        help="Run browser tests with a visible browser window",
+    )
