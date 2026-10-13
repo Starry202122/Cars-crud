@@ -34,10 +34,35 @@ def test_user_edits_car_and_change_survives_reload(page, live_server):
     page.get_by_label("Model", exact=True).fill("Accord")
     page.get_by_label("Year", exact=True).fill("2023")
     page.get_by_role("button", name="Save changes").click()
-    print("DEBUG URL:", page.url)
-    print("DEBUG PAGE:", page.locator("body").inner_text()[:2000])
-    print("DEBUG MODEL:", page.locator("#car-model").count())
-    print("DEBUG YEAR:", page.locator("#car-year").count())
+
+    # Wait for the save operation to redirect to the detail page
+    expect(page).to_have_url(
+        re.compile(r"/cars/\d+$"),
+        timeout=15000,
+    )
+
+    # Inspect the actual details after navigation
+    print("DEBUG URL:", page.url, flush=True)
+    print(
+        "DEBUG PAGE:",
+        page.locator("body").inner_text()[:2000],
+        flush=True,
+    )
+    print(
+        "DEBUG HEADING:",
+        page.locator("h1").all_text_contents(),
+        flush=True,
+    )
+    print(
+        "DEBUG MODEL:",
+        page.locator("#car-model").all_text_contents(),
+        flush=True,
+    )
+    print(
+        "DEBUG YEAR:",
+        page.locator("#car-year").all_text_contents(),
+        flush=True,
+    )
 
     expect(
         page.get_by_role("heading", name="Honda Accord")
