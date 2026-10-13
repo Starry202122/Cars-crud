@@ -34,6 +34,10 @@ def test_user_edits_car_and_change_survives_reload(page, live_server):
     page.get_by_label("Model", exact=True).fill("Accord")
     page.get_by_label("Year", exact=True).fill("2023")
     page.get_by_role("button", name="Save changes").click()
+    print("DEBUG URL:", page.url)
+    print("DEBUG PAGE:", page.locator("body").inner_text()[:2000])
+    print("DEBUG MODEL:", page.locator("#car-model").count())
+    print("DEBUG YEAR:", page.locator("#car-year").count())
 
     expect(
         page.get_by_role("heading", name="Honda Accord")
