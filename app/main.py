@@ -10,7 +10,9 @@ from fastapi import FastAPI, HTTPException, Path as PathParam, Response, status
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from app import database
+import os
+
+from app import database as sqlite_database
 from app.schemas import Car, CarInput
 
 APP_DIR = Path(__file__).resolve().parent
@@ -18,13 +20,19 @@ CarId = Annotated[int, PathParam(gt=0)]
 
 
 def create_app(database_path: str | Path | None = None) -> FastAPI:
+    backend = os.getenv("CARS_DB_BACKEND", "sqlite").lower()
+
+    if backend == "mysql":
+        from app import mysql_database as database
+    else:
+        database = sqlite_database
+
     # Tests pass their own path. Normal use stores cars.db in the project root.
     db_path = Path(
         database_path
         if database_path is not None
         else os.environ.get("CARS_DB_PATH", APP_DIR.parent / "cars.db")
     ).resolve()
-
     @asynccontextmanager
     async def lifespan(application: FastAPI) -> AsyncIterator[None]:
         database.initialize(db_path)
